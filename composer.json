@@ -1,7 +1,10 @@
 {
   "name": "kiesel/xp-composer-installer",
   "type": "composer-plugin",
-  "license": "BSD-Clause-3",
+  "version": "1.0.0-dev",
+  "description": "Composer Installer Packaging Plugin for XP Framework",
+
+  "license": "BSD-3-Clause",
   "autoload": { 
     "psr-0": { "kiesel\\xp" : "src/" }
   },
