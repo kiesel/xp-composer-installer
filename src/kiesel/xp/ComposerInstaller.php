@@ -18,6 +18,10 @@ class ComposerInstaller extends LibraryInstaller {
     // Update project's .pth file
     $base= $this->getPackageBasePath($package);
     $this->io->write('    Updating .pth file w/ paths in '.$base);
+
+    // Detect root directory
+    $this->io->write('    Root directory is '.$this->composer->getConfig()->get('home'));
+
   }
 
   public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target) {
