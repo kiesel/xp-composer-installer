@@ -1,0 +1,14 @@
+{
+  "name": "kiesel/xp-composer-installer",
+  "type": "composer-plugin",
+  "license": "BSD-Clause-3",
+  "autoload": { 
+    "psr-0": { "kiesel\\xp" : "src/" }
+  },
+  "extra": {
+    "class": "kiesel\\xp\\ComposerInstaller"
+  },
+  "require": {
+    "composer-plugin-api": "1.0.0"
+  }
+}
