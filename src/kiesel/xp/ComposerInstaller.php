@@ -1,4 +1,4 @@
-<?php namespace kiesel\xp\composer;
+<?php namespace kiesel\xp;
 
 use Composer\Composer;
 use Composer\Installer\LibraryInstaller;

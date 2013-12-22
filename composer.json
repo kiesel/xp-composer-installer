@@ -6,10 +6,10 @@
 
   "license": "BSD-3-Clause",
   "autoload": { 
-    "psr-0": { "kiesel\\xp" : "src/" }
+    "psr-0": { "kiesel\\xp\\" : "src/" }
   },
   "extra": {
-    "class": "kiesel\\xp\\ComposerInstaller"
+    "class": "kiesel\\xp\\ComposerInstallerPlugin"
   },
   "require": {
     "composer-plugin-api": "1.0.0"
