@@ -2,7 +2,7 @@
 
 use Composer\Installer\LibraryInstaller;
 use Composer\Package\PackageInterface;
-use Composer\Repostory\InstalledRepositoryInterface;
+use Composer\Repository\InstalledRepositoryInterface;
 
 class ComposerInstaller extends LibraryInstaller {
 
