@@ -24,7 +24,7 @@ class ComposerInstaller extends LibraryInstaller {
 
     // Find .pth files in added package
     foreach (new DirectoryIterator($base) as $file) {
-      if ('pth' !== $file->getExtension()) continue;
+      if ('.pth' !== substr($file->getFilename(), -4)) continue;
 
       $this->mergePth($package, $base, $file->getPathname());
     }
