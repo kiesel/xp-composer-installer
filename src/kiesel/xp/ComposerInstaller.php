@@ -44,7 +44,12 @@ class ComposerInstaller extends LibraryInstaller {
   }
 
   protected function mergePth(PackageInterface $package, $base, $from) {
-    $src= file(self::PTHFILE);
+    if (file_exists(self::PTHFILE)) {
+      $src= file(self::PTHFILE);
+    } else {
+      $src= array();
+    }
+
     $mrg= file($from);
 
     $this->io->write('     Merging '.$from);
