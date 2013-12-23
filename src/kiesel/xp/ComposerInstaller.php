@@ -64,7 +64,7 @@ class ComposerInstaller extends LibraryInstaller {
     $prefix= $this->filesystem->findShortestPath(realpath('.'), $base, TRUE);
     $add= $this->linesFrom($package, $prefix, $add);
     foreach ($add as $line) {
-      $src[]= $add;
+      $src[]= $line;
     }
 
     return $src;
