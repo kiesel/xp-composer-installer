@@ -18,13 +18,13 @@ class ComposerInstaller extends LibraryInstaller {
 
     // Update project's .pth file
     $base= $this->getPackageBasePath($package);
-    $this->io->write('    Updating .pth file w/ paths in '.$base);
+    $this->io->write('    Installing '.$package->getPrettyName());
 
     // Find .pth files in added package
     foreach (new DirectoryIterator($base) as $file) {
       if ('pth' !== $file->getExtension()) continue;
 
-      $this->mergePth($base, $file->getPathname());
+      $this->mergePth($package, $base, $file->getPathname());
     }
   }
 
@@ -41,21 +41,40 @@ class ComposerInstaller extends LibraryInstaller {
     parent::install($repo, $package);
   }
 
-  protected function mergePth($base, $from) {
+  protected function mergePth(PackageInterface $package, $base, $from) {
     $src= file(self::PTHFILE);
     $mrg= file($from);
 
+    $this->io->write('     Merging '.$from);
+    $entries= $this->mergedContents($package, $base, $src, $mrg);
+
+    file_put_contents(self::PTHFILE, implode("\n", $entries));
+  }
+
+  protected function mergedContents(PackageInterface $package, $base, $src, $add) {
+
     // Calculate shortest path to base
     $prefix= $this->filesystem->findShortestPath(realpath('.'), $base, TRUE);
+    $add= $this->linesFrom($package, $prefix, $add);
+    foreach ($add as $line) {
+      $src[]= $add;
+    }
+
+    return $src;
+  }
+
+  protected function linesFrom(PackageInterface $package, $prefix, $add) {
+    $src= array();
+
     $src[]= sprintf('# Entries added from composer %s (%s)', $package->getId(), $package->getPrettyName());
-    foreach ($mrg as $line) {
+    foreach ($add as $line) {
       if (!strlen(trim($line))) continue;
       if ('#' == $line{0}) continue;
 
-      $ref= $prefix.DIRECTORY_SEPARATOR.$line;
+      $ref= $this->filesystem->normalizePath($prefix.DIRECTORY_SEPARATOR.$line);
       $src[]= $ref;
     }
 
-    file_put_contents(self::PTHFILE, implode("\n", $src));
+    return $src;
   }
 }
