@@ -1,4 +1,4 @@
-<?php namespace kiesel\xp;
+<?php namespace xp\composer;
 
 use \DirectoryIterator;
 use Composer\Installer\LibraryInstaller;

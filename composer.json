@@ -1,16 +1,18 @@
 {
-  "name": "kiesel/xp-composer-installer",
+  "name": "xp-forge/xp-composer-installer",
   "type": "composer-plugin",
   "version": "1.0.0-dev",
-  "description": "Composer Installer Packaging Plugin for XP Framework",
 
+  "description": "Composer Installer Packaging Plugin for XP Framework",
   "license": "BSD-3-Clause",
+
   "autoload": { 
-    "psr-0": { "kiesel\\xp\\" : "src/" }
+    "psr-0": { "xp\\composer\\" : ["src/main/php/", "src/test/php"] }
   },
   "extra": {
-    "class": "kiesel\\xp\\ComposerInstallerPlugin"
+    "class": "xp\\composer\\ComposerInstallerPlugin"
   },
+
   "require": {
     "composer-plugin-api": "1.0.0"
   },
