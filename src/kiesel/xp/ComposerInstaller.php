@@ -7,10 +7,12 @@ use Composer\Repository\InstalledRepositoryInterface;
 
 
 class ComposerInstaller extends LibraryInstaller {
+  const TYPE    = 'xp-library';
   const PTHFILE = 'composer.pth';
+  const WHSP    = '    ';
 
   public function supports($packageType) {
-    return 'xp-library' === $packageType;
+    return self::TYPE === $packageType;
   }
 
   public function install(InstalledRepositoryInterface $repo, PackageInterface $package) {
@@ -18,9 +20,35 @@ class ComposerInstaller extends LibraryInstaller {
     // Let parent do regular work
     parent::install($repo, $package);
 
+    // Add new dependencies
+    $this->addDependencyToPth($package);
+  }
+
+  public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target) {
+
+    // Remove dependencies when uninstalling
+    $this->removeDependencyFromPth($initial);
+
+    // Let parent do regular work
+    parent::update($repo, $initial, $target);
+
+    // Add new dependencies
+    $this->addDependencyToPth($target);
+  }
+
+  public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package) {
+
+    // Remove dependencies when uninstalling
+    $this->removeDependencyFromPth($package);
+
+    // Let parent do regular work
+    parent::install($repo, $package);
+  }
+
+  protected function addDependencyToPth(PackageInterface $package) {
+
     // Update project's .pth file
     $base= $this->getPackageBasePath($package);
-    $this->io->write('    Installing '.$package->getPrettyName());
 
     // Find .pth files in added package
     foreach (new DirectoryIterator($base) as $file) {
@@ -30,58 +58,87 @@ class ComposerInstaller extends LibraryInstaller {
     }
   }
 
-  public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target) {
+  protected function removeDependencyFromPth(PackageInterface $package) {
 
-    // Let parent do regular work
-    parent::update($repo, $initial, $target);
+    // Update project's .pth file
+    $base= $this->getPackageBasePath($package);
 
-  }
+    // Find .pth files in added package
+    foreach (new DirectoryIterator($base) as $file) {
+      if ('.pth' !== substr($file->getFilename(), -4)) continue;
 
-  public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package) {
-
-    // Let parent do regular work
-    parent::install($repo, $package);
+      $this->unmergePth($package, $base, $file->getPathname());
+    }
   }
 
   protected function mergePth(PackageInterface $package, $base, $from) {
+    $src= new PthFile();
     if (file_exists(self::PTHFILE)) {
-      $src= file(self::PTHFILE);
-    } else {
-      $src= array();
+      $src->load(self::PTHFILE));
     }
 
-    $mrg= file($from);
+    $mrg= new PthFile();
+    $mrg->load($from);
 
-    $this->io->write('     Merging '.$from);
-    $entries= $this->mergedContents($package, $base, $src, $mrg);
-
-    file_put_contents(self::PTHFILE, implode("\n", $entries));
+    $this->io->write(self::WHSP.'Merging '.$from);
+    $this->mergedContents($package, $base, $src, $mrg);
+    $src->save(self::PTHFILE);
   }
 
-  protected function mergedContents(PackageInterface $package, $base, $src, $add) {
+  protected function unmergePth(PackageInterface $package, $base, $from) {
+    $src= new PthFile();
+    if (file_exists(self::PTHFILE)) {
+      $src->load(self::PTHFILE));
+    }
+
+    $mrg= new PthFile();
+    $mrg->load($from);
+
+    $this->io->write(self::WHSP.'Unmerging '.$from);
+    $this->unmergedContents($package, $base, $src, $mrg);
+    $src->save(self::PTHFILE);
+  }
+
+  protected function mergedContents(PackageInterface $package, $base, PthFile $src, PthFile $add) {
 
     // Calculate shortest path to base
     $prefix= $this->filesystem->findShortestPath(realpath('.'), $base, TRUE);
-    $add= $this->linesFrom($package, $prefix, $add);
-    foreach ($add as $line) {
-      $src[]= $line;
-    }
+    $src->mergeIn($this->rewriteLinesFrom($package, $prefix, $add));
 
     return $src;
   }
 
-  protected function linesFrom(PackageInterface $package, $prefix, $add) {
-    $src= array();
+  protected function unmergedContents(PackageInterface $package, $base, PthFile $src, PthFile $sub) {
 
-    $src[]= sprintf('# Entries added from composer %s (%s)', $package->getId(), $package->getPrettyName());
-    foreach ($add as $line) {
-      if (!strlen(trim($line))) continue;
-      if ('#' == $line{0}) continue;
-
-      $ref= $this->filesystem->normalizePath($prefix.DIRECTORY_SEPARATOR.$line);
-      $src[]= $ref;
-    }
+    // Calculate shortest path to base
+    $prefix= $this->filesystem->findShortestPath(realpath('.'), $base, TRUE);
+    $src->substract($this->rewriteLinesFrom($package, $prefix, $sub));
 
     return $src;
+  }
+
+  protected function rewriteLinesFrom(PackageInterface $package, $prefix, PthFile $add) {
+    $pth= new PthFile();
+
+    $pth->addEntry($this->commentFor($package));
+    foreach ($add->getEntries() as $line) {
+
+      // Keep comments & empty lines as is
+      if (
+        !strlen(trim($line)) ||
+        '#' == $line{0}
+      ) {
+        $pth->addEntry($line);
+      }
+
+      $ref= $this->filesystem->normalizePath($prefix.DIRECTORY_SEPARATOR.$line);
+      $pth->addEntry($ref);
+    }
+
+    return $pth;
+  }
+
+  protected function commentFor(PackageInterface $package) {
+    return sprintf('# Entries added by composer for %s', $package->getPrettyName());
   }
 }
