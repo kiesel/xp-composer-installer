@@ -14,7 +14,7 @@ class PthFile {
     }
   }
 
-  public function saveTo($path) {
+  public function save($path) {
     file_put_contents($path, implode("\n", $this->lines));
   }
 
