@@ -74,7 +74,7 @@ class ComposerInstaller extends LibraryInstaller {
   protected function mergePth(PackageInterface $package, $base, $from) {
     $src= new PthFile();
     if (file_exists(self::PTHFILE)) {
-      $src->load(self::PTHFILE));
+      $src->load(self::PTHFILE);
     }
 
     $mrg= new PthFile();
@@ -88,7 +88,7 @@ class ComposerInstaller extends LibraryInstaller {
   protected function unmergePth(PackageInterface $package, $base, $from) {
     $src= new PthFile();
     if (file_exists(self::PTHFILE)) {
-      $src->load(self::PTHFILE));
+      $src->load(self::PTHFILE);
     }
 
     $mrg= new PthFile();
