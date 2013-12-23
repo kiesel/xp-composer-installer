@@ -1,8 +1,10 @@
 <?php namespace kiesel\xp;
 
+use \DirectoryIterator;
 use Composer\Installer\LibraryInstaller;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
+
 
 class ComposerInstaller extends LibraryInstaller {
   const PTHFILE = 'composer.pth';
