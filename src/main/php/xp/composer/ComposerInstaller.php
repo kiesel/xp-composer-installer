@@ -5,7 +5,6 @@ use Composer\Installer\LibraryInstaller;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
 
-
 class ComposerInstaller extends LibraryInstaller {
   const TYPE    = 'xp-library';
   const PTHFILE = 'composer.pth';
@@ -42,7 +41,7 @@ class ComposerInstaller extends LibraryInstaller {
     $this->removeDependencyFromPth($package);
 
     // Let parent do regular work
-    parent::install($repo, $package);
+    parent::uninstall($repo, $package);
   }
 
   protected function addDependencyToPth(PackageInterface $package) {
