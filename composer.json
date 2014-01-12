@@ -1,7 +1,6 @@
 {
   "name": "xp-forge/xp-composer-installer",
   "type": "composer-plugin",
-  "version": "1.0.0-dev",
 
   "description": "Composer Installer Packaging Plugin for XP Framework",
   "license": "BSD-3-Clause",
